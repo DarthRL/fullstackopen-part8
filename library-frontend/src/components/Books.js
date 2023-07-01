@@ -1,22 +1,29 @@
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS } from '../queries'
+import { useEffect, useState } from 'react'
 
 const Books = props => {
-  const allResult = useQuery(ALL_BOOKS)
+  const [genres, setGenres] = useState([])
   const result = useQuery(ALL_BOOKS)
+  useEffect(() => {
+    if (!result.loading)
+      setGenres(
+        Array.from(
+          new Set(genres.concat(result.data.allBooks.map(b => b.genres).flat()))
+        )
+      )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.data])
 
   if (!props.show) {
     return null
   }
 
-  if (result.loading || allResult.loading) {
+  if (result.loading) {
     return null
   }
 
-  const allBooks = allResult.data.allBooks
   const books = result.data.allBooks
-
-  const genres = Array.from(new Set(allBooks.map(b => b.genres).flat()))
 
   return (
     <div>
