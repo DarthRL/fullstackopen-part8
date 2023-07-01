@@ -11,18 +11,29 @@ const NewBook = props => {
 
   const [createBook] = useMutation(CREATE_BOOK, {
     update: (cache, response) => {
+      for (const genre of response.data.addBook.genres) {
+        cache.updateQuery(
+          { query: ALL_BOOKS, variables: { genre: genre } },
+          ({ allBooks }) => {
+            return {
+              allBooks: allBooks.concat(response.data.addBook),
+            }
+          }
+        )
+      }
       cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
         return {
           allBooks: allBooks.concat(response.data.addBook),
         }
       })
       cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
-        if (allAuthors.some(a => a.name === (response.data.addBook.author.name))) return {allAuthors}
+        if (allAuthors.some(a => a.name === response.data.addBook.author.name))
+          return { allAuthors }
         return {
           allAuthors: allAuthors.concat(response.data.addBook.author),
         }
       })
-    }
+    },
   })
 
   if (!props.show) {
