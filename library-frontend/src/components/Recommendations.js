@@ -2,8 +2,11 @@ import { useQuery } from '@apollo/client'
 import { ALL_BOOKS, ME } from '../queries'
 
 const Recommendations = props => {
-  const booksResult = useQuery(ALL_BOOKS)
   const meResult = useQuery(ME)
+  const booksResult = useQuery(ALL_BOOKS, {
+    variables: {  genre: meResult.loading ? null : meResult.data.me.favoriteGenre },
+    skip: meResult.loading,
+  })
 
   if (!props.show) {
     return null
@@ -13,16 +16,12 @@ const Recommendations = props => {
     return null
   }
 
-  const books = booksResult.data.allBooks
+  const filteredBooks = booksResult.data.allBooks
 
-  const genre = meResult.data.me.favoriteGenre
-
-  const filteredBooks = books.filter(b => b.genres.includes(genre))
-  
   return (
     <div>
       <h2>recommendations</h2>
-      <p>books in your favorite genre {genre}</p>
+      <p>books in your favorite genre {meResult.data.me.favoriteGenre}</p>
       <table>
         <tbody>
           <tr>
