@@ -121,11 +121,13 @@ const resolvers = {
     },
   },
   Author: {
-    bookCount: root => Book.find({ author: root.name }).count(),
+    bookCount: (root, args, { loaders }) => {
+      return loaders.bookCountLoader.load(root.id)
+    },
   },
   Subscription: {
     bookAdded: {
-      subscribe: () => pubsub.asyncIterator('BOOK_ADDED')
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED'),
     },
   },
 }

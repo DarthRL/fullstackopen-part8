@@ -12,6 +12,8 @@ const http = require('http')
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/lib/use/ws')
 
+const loaders = require('./loaders')
+
 require('dotenv').config()
 
 let authors = [
@@ -176,8 +178,9 @@ const start = async () => {
             process.env.JWT_SECRET
           )
           const currentUser = await User.findById(decodedToken.id)
-          return { currentUser }
+          return { currentUser, loaders }
         }
+        return { loaders }
       },
     })
   )
